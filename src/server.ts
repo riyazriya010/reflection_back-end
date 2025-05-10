@@ -6,6 +6,7 @@ import { connectDB } from './config/dbConfig';
 import { employeeRoutes } from './routes/employee.routes';
 import { managerRoutes } from './routes/manager.routes';
 import cors from 'cors';
+import morgan from 'morgan';
 
 
 
@@ -20,6 +21,7 @@ const corsOptions = {
 }
 
 app.use(cors(corsOptions))
+app.use(morgan('dev'))
 
 connectDB();
 
