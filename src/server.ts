@@ -6,12 +6,9 @@ import { connectDB } from './config/dbConfig';
 import { employeeRoutes } from './routes/employee.routes';
 import { managerRoutes } from './routes/manager.routes';
 import cors from 'cors';
-<<<<<<< HEAD
 import morgan from 'morgan';
-=======
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
->>>>>>> employee
 
 
 
@@ -28,21 +25,16 @@ const corsOptions = {
 }
 
 app.use(cors(corsOptions))
-<<<<<<< HEAD
+
 app.use(morgan('dev'))
 
 connectDB();
 
-app.get('/', (req: Request, res: Response): void => {
-  res.send('Hello World Riyas');
-});
-=======
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
->>>>>>> employee
 
 app.use('/api/employee', employeeRoutes)
 app.use('/api/manager', managerRoutes);
