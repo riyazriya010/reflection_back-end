@@ -1,3 +1,4 @@
+import { response } from "express";
 import { IEmployeeServiceMethods } from "../../interface/employee/employee.interface";
 import { EmployeeLoginData, EmployeeSignUpData } from "../../interface/employee/employee.types";
 import { IEmployee } from "../../models/employee.model";
@@ -46,6 +47,15 @@ export default class EmployeeAuthServices implements IEmployeeServiceMethods {
             }
             return login
         } catch (error: unknown) {
+            throw error
+        }
+    }
+
+    async getEmployees(empId: string): Promise<IEmployee[] | []> {
+        try{
+            const getEmployees = await this.employeeAuthRepository.getEmployees(empId)
+            return getEmployees
+        }catch(error: unknown){
             throw error
         }
     }
