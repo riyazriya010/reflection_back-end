@@ -20,6 +20,10 @@ export default class EmployeeAuthRepository extends CommonBaseRepository<{
         return this.findOne('EmployeeModel', { email: employeeData.email })
     }
 
+    async getEmployees(empId: string): Promise<IEmployee[]> {
+        return this.findAll('EmployeeModel', { _id: { $ne: empId } });
+    }
+
     async findByEmail(email: string): Promise<IEmployee | null> {
         return this.findOne('EmployeeModel', { email });
     }
