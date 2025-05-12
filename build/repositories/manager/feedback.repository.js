@@ -14,42 +14,23 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const employee_model_1 = __importDefault(require("../../models/employee.model"));
 const feedback_model_1 = __importDefault(require("../../models/feedback.model"));
-const form_model_1 = __importDefault(require("../../models/form.model"));
-const request_model_1 = __importDefault(require("../../models/request.model"));
 const baseRepository_1 = __importDefault(require("../base/baseRepository"));
-class EmployeeAuthRepository extends baseRepository_1.default {
+class ManagerFeedbackRepository extends baseRepository_1.default {
     constructor() {
         super({
-            EmployeeModel: employee_model_1.default,
-            FeedbackRequestModel: request_model_1.default,
-            FormModel: form_model_1.default,
-            FeedbackModel: feedback_model_1.default
+            FeedbackModel: feedback_model_1.default,
+            EmployeeModel: employee_model_1.default
         });
     }
-    employeeSignup(employeeData) {
+    findAllDeptEmployees(department) {
         return __awaiter(this, void 0, void 0, function* () {
-            return this.createData('EmployeeModel', employeeData);
+            return this.findAll('EmployeeModel', { department });
         });
     }
-    employeeLogin(employeeData) {
+    getEmployeesFeedback() {
         return __awaiter(this, void 0, void 0, function* () {
-            return this.findOne('EmployeeModel', { email: employeeData.email });
-        });
-    }
-    getEmployees(empId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return this.findAll('EmployeeModel', { _id: { $ne: empId } });
-        });
-    }
-    findByEmail(email) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return this.findOne('EmployeeModel', { email });
-        });
-    }
-    findByIds(id) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return this.findById('EmployeeModel', id);
+            return this.findAll('FeedbackModel');
         });
     }
 }
-exports.default = EmployeeAuthRepository;
+exports.default = ManagerFeedbackRepository;

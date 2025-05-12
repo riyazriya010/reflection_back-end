@@ -59,6 +59,19 @@ class EmployeeAuthServices {
             }
         });
     }
+    getEmployees(empId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const loggedPerson = yield this.employeeAuthRepository.findByIds(empId);
+                const allEmployees = yield this.employeeAuthRepository.getEmployees(empId);
+                const filteredEmployees = allEmployees.filter(emp => emp.department === loggedPerson.department);
+                return filteredEmployees;
+            }
+            catch (error) {
+                throw error;
+            }
+        });
+    }
 }
 exports.default = EmployeeAuthServices;
 const employeeAuthRepository = new auth_repository_1.default();

@@ -17,7 +17,7 @@ const feedback_model_1 = __importDefault(require("../../models/feedback.model"))
 const form_model_1 = __importDefault(require("../../models/form.model"));
 const request_model_1 = __importDefault(require("../../models/request.model"));
 const baseRepository_1 = __importDefault(require("../base/baseRepository"));
-class EmployeeAuthRepository extends baseRepository_1.default {
+class EmployeeFeedbackRepository extends baseRepository_1.default {
     constructor() {
         super({
             EmployeeModel: employee_model_1.default,
@@ -26,24 +26,29 @@ class EmployeeAuthRepository extends baseRepository_1.default {
             FeedbackModel: feedback_model_1.default
         });
     }
-    employeeSignup(employeeData) {
+    requestFeedback(data) {
         return __awaiter(this, void 0, void 0, function* () {
-            return this.createData('EmployeeModel', employeeData);
+            return this.createData('FeedbackRequestModel', data);
         });
     }
-    employeeLogin(employeeData) {
+    requestedFeedback(senderId) {
         return __awaiter(this, void 0, void 0, function* () {
-            return this.findOne('EmployeeModel', { email: employeeData.email });
+            return this.findAll('FeedbackRequestModel', { senderId: { $eq: senderId } });
         });
     }
-    getEmployees(empId) {
+    getOthersRequested(receiverId, status) {
         return __awaiter(this, void 0, void 0, function* () {
-            return this.findAll('EmployeeModel', { _id: { $ne: empId } });
+            return this.findAll('FeedbackRequestModel', { receiverId: receiverId, status: { $regex: new RegExp(`^${status}$`, 'i') } });
         });
     }
-    findByEmail(email) {
+    getAllForm() {
         return __awaiter(this, void 0, void 0, function* () {
-            return this.findOne('EmployeeModel', { email });
+            return this.findAll('FormModel');
+        });
+    }
+    submitFeedback(data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.createData('FeedbackModel', data);
         });
     }
     findByIds(id) {
@@ -51,5 +56,38 @@ class EmployeeAuthRepository extends baseRepository_1.default {
             return this.findById('EmployeeModel', id);
         });
     }
+    FindRequestedFeedbackById(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.findById('FeedbackRequestModel', id);
+        });
+    }
+    updateRequestedFeedback(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.updateById('FeedbackRequestModel', id, {
+                status: 'responded',
+                updatedAt: new Date()
+            });
+        });
+    }
+    getAllRequestedToMe(receiverId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.findAll('FeedbackRequestModel', { receiverId: receiverId });
+        });
+    }
+    rejectRequest(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.updateById('FeedbackRequestModel', id, { status: 'rejected', updatedAt: new Date() });
+        });
+    }
+    getMyRequestes(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.findAll('FeedbackModel', { requestedId: id });
+        });
+    }
+    getAllFeedbackForReceiver(receiverId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.findAll('FeedbackModel', { receiverId });
+        });
+    }
 }
-exports.default = EmployeeAuthRepository;
+exports.default = EmployeeFeedbackRepository;

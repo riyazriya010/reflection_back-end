@@ -1,6 +1,6 @@
 import express from "express"
 import { adminController } from "../controllers/admin/admin"
-import authenticateToken from "../middleware/verifytoken"
+import authenticateToken from "../middleware/verifyToken"
 import authenticateBlackList from "../middleware/blacklistToken"
 
 const router = express.Router()

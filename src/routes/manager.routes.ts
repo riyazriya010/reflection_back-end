@@ -1,7 +1,7 @@
 import express from "express"
 import { managerAuthController } from "../controllers/manager/auth.controller"
 import { managerFeedbackController } from "../controllers/manager/feedback.controller"
-import authenticateToken from "../middleware/verifytoken"
+import authenticateToken from "../middleware/verifyToken"
 import authenticateBlackList from "../middleware/blacklistToken"
 
 
