@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import EmployeeAuthServices, { employeeAuthServices } from "../../services/employee/auth.services";
 import { JwtService } from "../../integrations/jwt";
 import getId from "../../integrations/getId";
+import { sendAuthResponse, sendDataResponse, sendErrorResponse } from "../../utils/responseHelpers";
+import { HttptatusCode } from "../../utils/httpStatusCodes";
 
 export default class EmployeeAuthController {
     private employeeAuthServices: EmployeeAuthServices;
@@ -12,7 +14,7 @@ export default class EmployeeAuthController {
         this.jwtService = new JwtService()
     }
 
-    async employeeSignUp(req: Request, res: Response): Promise<any> {
+    async employeeSignUp(req: Request, res: Response): Promise<void> {
         try {
             const data = req.body
             const savedEmployee = await this.employeeAuthServices.employeeSignup(data)
@@ -20,35 +22,29 @@ export default class EmployeeAuthController {
             const accessToken = await this.jwtService.createToken(savedEmployee?._id, String(savedEmployee?.role))
             const refreshToken = await this.jwtService.createRefreshToken(savedEmployee?._id, String(savedEmployee?.role))
 
-            return res
-                .status(200)
-                .cookie('accessToken', accessToken, {
-                    httpOnly: false,
-                    secure: true,
-                    sameSite: "none",
-                }).cookie('refreshToken', refreshToken, {
-                    httpOnly: true,
-                    secure: true,
-                    sameSite: "none",
-                })
-                .send({
-                    success: true,
-                    message: 'Employee Added to DB Successfully',
-                    result: savedEmployee
-                })
+            sendAuthResponse(
+                res,
+                String(accessToken),
+                String(refreshToken),
+                "Employee Added to DB Successfully",
+                HttptatusCode.CREATED,
+                savedEmployee
+            )
+            return
 
-            // return res.status(201).send({ message: "Employee Saved to DB", success: true, result: savedEmployee })
         } catch (error: unknown) {
             if (error instanceof Error) {
                 if (error.name === 'EmployeeAlreadyExist') {
-                    res.status(409).send({ message: "Employee Already Exist", success: false })
+                    sendErrorResponse(res, HttptatusCode.CONFLICT, "Employee Already Exist")
                     return
                 }
             }
+            sendErrorResponse(res, HttptatusCode.INTERNAL_SERVER_ERROR, "Internal Server Error")
+            return
         }
     }
 
-    async employeeLogin(req: Request, res: Response): Promise<any> {
+    async employeeLogin(req: Request, res: Response): Promise<void> {
         try {
             const data = req.body
             const login = await this.employeeAuthServices.employeeLogin(data)
@@ -56,44 +52,43 @@ export default class EmployeeAuthController {
             const accessToken = await this.jwtService.createToken(login?._id, String(login?.role))
             const refreshToken = await this.jwtService.createRefreshToken(login?._id, String(login?.role))
 
-            return res
-                .status(200)
-                .cookie('accessToken', accessToken, {
-                    httpOnly: false,
-                    secure: true,
-                    sameSite: "none",
-                }).cookie('refreshToken', refreshToken, {
-                    httpOnly: true,
-                    secure: true,
-                    sameSite: "none",
-                })
-                .send({
-                    success: true,
-                    message: 'Employee Logged Successfully',
-                    result: login
-                })
+            sendAuthResponse(
+                res,
+                String(accessToken),
+                String(refreshToken),
+                "Employee Logged Successfully",
+                HttptatusCode.OK,
+                login
+            )
+            return
 
         } catch (error: unknown) {
             if (error instanceof Error) {
                 if (error.name === "InvalidCredentials") {
-                    return res.status(401).send({ message: "Invalid Credentials", success: false })
+                    sendErrorResponse(res, HttptatusCode.UNAUTHORIZED, "Invalid Credentials")
+                    return
                 }
             }
+            sendErrorResponse(res, HttptatusCode.INTERNAL_SERVER_ERROR, "Internal Server Error")
+            return
         }
     }
 
     async getEmployee(req: Request, res: Response): Promise<any> {
         try {
-            //Current Logged Employee Id that Dont we need to get
             const employeeId = await getId('accessToken', req) as string
             const getEmployees = await this.employeeAuthServices.getEmployees(employeeId)
-            return res.status(200).send({ message: "All Employees Got", success: true, result: getEmployees })
+            sendDataResponse(res, 'All Employees Got', getEmployees, HttptatusCode.OK)
+            return
         } catch (error: unknown) {
-            if (error instanceof Error) {
-                if (error.name === "NotEmployeesFound") {
-                    return res.status(404).send({ message: "Not Employees Found", success: false })
-                }
-            }
+            // if (error instanceof Error) {
+            //     if (error.name === "NotEmployeesFound") {
+            //         sendErrorResponse(res, HttptatusCode.NOT_FOUND, "Not Employees Found")
+            //         return
+            //     }
+            // }
+            sendErrorResponse(res, HttptatusCode.INTERNAL_SERVER_ERROR, "Internal Server Error")
+            return
         }
     }
 
@@ -119,7 +114,6 @@ export default class EmployeeAuthController {
             return
         }
     }
-
 
 }
 

@@ -1,9 +1,12 @@
 import { response } from "express";
 import { IEmployeeServiceMethods } from "../../interface/employee/employee.interface";
-import { EmployeeLoginData, EmployeeSignUpData } from "../../interface/employee/employee.types";
+import { EmployeeLoginData, EmployeerequestFeedback, EmployeeSignUpData } from "../../interface/employee/employee.types";
 import { IEmployee } from "../../models/employee.model";
 import EmployeeAuthRepository from "../../repositories/employee/auth.repository";
 import bcrypt from "bcrypt"
+import { IFeedbackRequest } from "../../models/request.model";
+import mongoose from "mongoose";
+import { IForm } from "../../models/form.model";
 
 
 export default class EmployeeAuthServices implements IEmployeeServiceMethods {
@@ -51,14 +54,19 @@ export default class EmployeeAuthServices implements IEmployeeServiceMethods {
         }
     }
 
-    async getEmployees(empId: string): Promise<IEmployee[] | []> {
-        try{
-            const getEmployees = await this.employeeAuthRepository.getEmployees(empId)
-            return getEmployees
-        }catch(error: unknown){
-            throw error
-        }
+    async getEmployees(empId: string): Promise<IEmployee[]> {
+    try {
+        const loggedPerson = await this.employeeAuthRepository.findByIds(empId);
+
+        const allEmployees = await this.employeeAuthRepository.getEmployees(empId);
+        const filteredEmployees = allEmployees.filter(emp =>
+            emp.department === loggedPerson.department
+        );
+        return filteredEmployees;
+    } catch (error: unknown) {
+        throw error;
     }
+}
 
 }
 

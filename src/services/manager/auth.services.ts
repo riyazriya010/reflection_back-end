@@ -3,6 +3,8 @@ import { ManagerLoginData, ManagerSignUpData } from "../../interface/manager/man
 import { IEmployee } from "../../models/employee.model";
 import bcrypt from "bcrypt";
 import ManagerAuthRepository from "../../repositories/manager/auth.repository";
+import { IManager } from "../../models/manager.model";
+import { IFeedback } from "../../models/feedback.model";
 
 
 export default class ManagerAuthServices implements IManagerServiceMethods {
@@ -12,7 +14,7 @@ export default class ManagerAuthServices implements IManagerServiceMethods {
         this.managerAuthRepository = managerAuthRepository
     }
 
-    async managerSignup(managerData: ManagerSignUpData): Promise<IEmployee> {
+    async managerSignup(managerData: ManagerSignUpData): Promise<IManager> {
         try {
             // Find Employee Already Exist With Email
             const ExistManager = await this.managerAuthRepository.findByEmail(managerData.email);
@@ -29,7 +31,7 @@ export default class ManagerAuthServices implements IManagerServiceMethods {
         }
     }
 
-    async managerLogin(managerData: ManagerLoginData): Promise<IEmployee | null> {
+    async managerLogin(managerData: ManagerLoginData): Promise<IManager | null> {
         try {
             const login = await this.managerAuthRepository.managerLogin(managerData)
             if (!login) {

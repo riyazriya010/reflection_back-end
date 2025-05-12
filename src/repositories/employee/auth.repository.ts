@@ -1,14 +1,23 @@
 import { IEmployeeMethods } from "../../interface/employee/employee.interface";
-import { EmployeeLoginData, EmployeeSignUpData } from "../../interface/employee/employee.types";
+import { EmployeeLoginData } from "../../interface/employee/employee.types";
 import EmployeeModel, { IEmployee } from "../../models/employee.model";
+import FeedbackModel, { IFeedback } from "../../models/feedback.model";
+import FormModel, { IForm } from "../../models/form.model";
+import FeedbackRequestModel, { IFeedbackRequest } from "../../models/request.model";
 import CommonBaseRepository from "../base/baseRepository";
 
 export default class EmployeeAuthRepository extends CommonBaseRepository<{
-    EmployeeModel: IEmployee
+    EmployeeModel: IEmployee,
+    FeedbackRequestModel: IFeedbackRequest,
+    FormModel: IForm,
+    FeedbackModel: IFeedback
 }> implements IEmployeeMethods {
     constructor() {
         super({
-            EmployeeModel: EmployeeModel
+            EmployeeModel: EmployeeModel,
+            FeedbackRequestModel: FeedbackRequestModel,
+            FormModel: FormModel,
+            FeedbackModel: FeedbackModel
         })
     }
 
@@ -24,9 +33,15 @@ export default class EmployeeAuthRepository extends CommonBaseRepository<{
         return this.findAll('EmployeeModel', { _id: { $ne: empId } });
     }
 
-    async findByEmail(email: string): Promise<IEmployee | null> {
+    async findByEmail(email: string): Promise<any> {
         return this.findOne('EmployeeModel', { email });
     }
 
+    async findByIds(id: string): Promise<any> {
+        return this.findById('EmployeeModel', id);
+    }
+
+
 
 }
+
